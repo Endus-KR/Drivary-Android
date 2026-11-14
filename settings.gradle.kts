@@ -19,6 +19,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Pleos Connect SDK
+        maven("https://nexus-playground.pleos.ai/repository/maven-releases/")
     }
 }
 
