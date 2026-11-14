@@ -15,6 +15,7 @@ sealed interface DebugSettingsIntent {
     data class SelectGear(val gear: GearUiModel) : DebugSettingsIntent
     data class AddDistance(val km: Double) : DebugSettingsIntent
     data class SelectConfirmDelay(val seconds: Long) : DebugSettingsIntent
+    data object ClickAddSampleTrips : DebugSettingsIntent
     data object ClickBack : DebugSettingsIntent
 }
 
