@@ -29,6 +29,7 @@ import com.endus.drivary.presentation.designsystem.theme.DrivaryTheme
 @Composable
 fun HomeRoute(
     onNavigateToDebugSettings: () -> Unit,
+    onNavigateToLogbook: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -37,6 +38,7 @@ fun HomeRoute(
         viewModel.sideEffect.collect { effect ->
             when (effect) {
                 HomeSideEffect.NavigateToDebugSettings -> onNavigateToDebugSettings()
+                HomeSideEffect.NavigateToLogbook -> onNavigateToLogbook()
             }
         }
     }
@@ -54,6 +56,10 @@ fun HomeScreen(
         DrivaryTopBar(
             title = "운행 기록",
             actions = {
+                DrivaryButton(
+                    text = "운행기록부",
+                    onClick = { onIntent(HomeIntent.ClickLogbook) },
+                )
                 DrivaryButton(
                     text = "디버그 설정",
                     onClick = { onIntent(HomeIntent.ClickDebugSettings) },

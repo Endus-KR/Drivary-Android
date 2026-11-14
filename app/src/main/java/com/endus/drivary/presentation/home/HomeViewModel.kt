@@ -42,6 +42,7 @@ class HomeViewModel @Inject constructor(
     fun onIntent(intent: HomeIntent) {
         when (intent) {
             HomeIntent.ClickDebugSettings -> sendSideEffect(HomeSideEffect.NavigateToDebugSettings)
+            HomeIntent.ClickLogbook -> sendSideEffect(HomeSideEffect.NavigateToLogbook)
         }
     }
 
