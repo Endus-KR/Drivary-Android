@@ -3,6 +3,7 @@ package com.endus.drivary.presentation.debug
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.endus.drivary.domain.usecase.AddDemoDistanceUseCase
+import com.endus.drivary.domain.usecase.AddSampleTripsUseCase
 import com.endus.drivary.domain.usecase.ObserveConfirmDelayUseCase
 import com.endus.drivary.domain.usecase.ObserveCurrentGearUseCase
 import com.endus.drivary.domain.usecase.ObserveDemoExtraDistanceUseCase
@@ -36,6 +37,7 @@ class DebugSettingsViewModel @Inject constructor(
     private val setDemoGearUseCase: SetDemoGearUseCase,
     private val addDemoDistanceUseCase: AddDemoDistanceUseCase,
     private val setConfirmDelayUseCase: SetConfirmDelayUseCase,
+    private val addSampleTripsUseCase: AddSampleTripsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DebugSettingsUiState())
@@ -79,6 +81,7 @@ class DebugSettingsViewModel @Inject constructor(
             is DebugSettingsIntent.SelectGear -> selectGear(intent.gear)
             is DebugSettingsIntent.AddDistance -> addDistance(intent.km)
             is DebugSettingsIntent.SelectConfirmDelay -> selectConfirmDelay(intent.seconds)
+            DebugSettingsIntent.ClickAddSampleTrips -> addSampleTrips()
             DebugSettingsIntent.ClickBack -> sendSideEffect(DebugSettingsSideEffect.NavigateBack)
         }
     }
@@ -101,6 +104,14 @@ class DebugSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             setConfirmDelayUseCase(seconds.seconds)
                 .onFailure { throwable -> handleFailure(throwable, "확정 대기 시간을 바꾸지 못했어요") }
+        }
+    }
+
+    private fun addSampleTrips() {
+        viewModelScope.launch {
+            addSampleTripsUseCase()
+                .onSuccess { trips -> sendSideEffect(DebugSettingsSideEffect.ShowMessage("샘플 운행 ${trips.size}건을 넣었어요")) }
+                .onFailure { throwable -> handleFailure(throwable, "샘플 운행을 넣지 못했어요") }
         }
     }
 

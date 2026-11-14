@@ -1,6 +1,7 @@
 package com.endus.drivary.data.datasource
 
 import com.endus.drivary.domain.model.Trip
+import com.endus.drivary.domain.model.TripClassification
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,5 +23,15 @@ class TripLocalDataSource @Inject constructor() {
         val saved = trip.copy(id = nextId.getAndIncrement())
         trips.update { current -> (current + saved).sortedBy { it.startedAt } }
         return saved
+    }
+
+    fun updateClassification(tripId: Long, classification: TripClassification): Trip {
+        var updated: Trip? = null
+        trips.update { current ->
+            current.map { trip ->
+                if (trip.id == tripId) trip.copy(classification = classification).also { updated = it } else trip
+            }
+        }
+        return checkNotNull(updated) { "운행을 찾을 수 없다: $tripId" }
     }
 }

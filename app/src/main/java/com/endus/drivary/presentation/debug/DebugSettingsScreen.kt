@@ -111,6 +111,14 @@ fun DebugSettingsScreen(
                 }
             }
             DrivaryCard {
+                SectionTitle(text = "샘플 데이터")
+                DrivaryButton(
+                    text = "이번 달 샘플 운행 5건 넣기",
+                    onClick = { onIntent(DebugSettingsIntent.ClickAddSampleTrips) },
+                    style = DrivaryButtonStyle.Secondary,
+                )
+            }
+            DrivaryCard {
                 SectionTitle(text = "확정 대기 시간 (P 이후)")
                 OptionRow {
                     uiState.confirmDelayOptions.forEach { seconds ->

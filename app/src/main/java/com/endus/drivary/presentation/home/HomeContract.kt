@@ -6,8 +6,10 @@ data class HomeUiState(
 
 sealed interface HomeIntent {
     data object ClickDebugSettings : HomeIntent
+    data object ClickLogbook : HomeIntent
 }
 
 sealed interface HomeSideEffect {
     data object NavigateToDebugSettings : HomeSideEffect
+    data object NavigateToLogbook : HomeSideEffect
 }
