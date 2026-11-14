@@ -6,12 +6,14 @@ import com.endus.drivary.data.repository.DriverRepositoryImpl
 import com.endus.drivary.data.repository.PlaceRepositoryImpl
 import com.endus.drivary.data.repository.TripRepositoryImpl
 import com.endus.drivary.data.repository.VehicleRepositoryImpl
+import com.endus.drivary.data.repository.WorkPlaceRepositoryImpl
 import com.endus.drivary.domain.repository.DemoSettingsRepository
 import com.endus.drivary.domain.repository.DemoVehicleRepository
 import com.endus.drivary.domain.repository.DriverRepository
 import com.endus.drivary.domain.repository.PlaceRepository
 import com.endus.drivary.domain.repository.TripRepository
 import com.endus.drivary.domain.repository.VehicleRepository
+import com.endus.drivary.domain.repository.WorkPlaceRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -45,4 +47,8 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindDriverRepository(impl: DriverRepositoryImpl): DriverRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWorkPlaceRepository(impl: WorkPlaceRepositoryImpl): WorkPlaceRepository
 }

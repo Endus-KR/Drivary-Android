@@ -10,4 +10,14 @@ interface DemoSettingsRepository {
     fun observeConfirmDelay(): Flow<Duration>
 
     suspend fun setConfirmDelay(delay: Duration)
+
+    /** 다음에 확정되는 운행의 도착지 id (장소 학습 대신 시연에서 고른다) */
+    fun observeNextDestinationId(): Flow<Long?>
+
+    suspend fun setNextDestinationId(placeId: Long?)
+
+    /** 시연이 주말에 있어도 평일 자동 분류를 보여 주기 위해 오늘을 평일로 본다 */
+    fun observeTreatTodayAsWeekday(): Flow<Boolean>
+
+    suspend fun setTreatTodayAsWeekday(enabled: Boolean)
 }

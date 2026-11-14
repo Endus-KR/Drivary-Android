@@ -15,4 +15,16 @@ class DemoSettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setConfirmDelay(delay: Duration) =
         demoSettingsLocalDataSource.setConfirmDelay(delay)
+
+    override fun observeNextDestinationId(): Flow<Long?> =
+        demoSettingsLocalDataSource.observeNextDestinationId()
+
+    override suspend fun setNextDestinationId(placeId: Long?) =
+        demoSettingsLocalDataSource.setNextDestinationId(placeId)
+
+    override fun observeTreatTodayAsWeekday(): Flow<Boolean> =
+        demoSettingsLocalDataSource.observeTreatTodayAsWeekday()
+
+    override suspend fun setTreatTodayAsWeekday(enabled: Boolean) =
+        demoSettingsLocalDataSource.setTreatTodayAsWeekday(enabled)
 }
