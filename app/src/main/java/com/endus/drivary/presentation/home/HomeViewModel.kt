@@ -2,12 +2,19 @@ package com.endus.drivary.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.endus.drivary.domain.model.RecordingStatus
 import com.endus.drivary.domain.model.TripClassification
 import com.endus.drivary.domain.usecase.ClassifyTripUseCase
 import com.endus.drivary.domain.usecase.ObservePendingTripCardUseCase
+import com.endus.drivary.domain.usecase.ObserveRecordingStatusUseCase
 import com.endus.drivary.domain.usecase.ObserveTripsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,10 +26,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Clock
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    observeRecordingStatusUseCase: ObserveRecordingStatusUseCase,
+    private val clock: Clock,
     observeTripsUseCase: ObserveTripsUseCase,
     observePendingTripCardUseCase: ObservePendingTripCardUseCase,
     private val classifyTripUseCase: ClassifyTripUseCase,
@@ -35,6 +46,24 @@ class HomeViewModel @Inject constructor(
     val sideEffect: Flow<HomeSideEffect> = _sideEffect.receiveAsFlow()
 
     init {
+        observeRecordingStatusUseCase()
+            .flatMapLatest { status ->
+                if (status is RecordingStatus.ConfirmPending) {
+                    // 확정까지 남은 시간을 줄여 가며 보여 준다
+                    flow {
+                        while (true) {
+                            emit(status.toUiModel(clock.instant()))
+                            delay(COUNTDOWN_TICK_MS)
+                        }
+                    }
+                } else {
+                    flowOf(status.toUiModel(clock.instant()))
+                }
+            }
+            .onEach { status -> _uiState.update { it.copy(recordingStatus = status) } }
+            .catch { throwable -> Timber.e(throwable) }
+            .launchIn(viewModelScope)
+
         observeTripsUseCase()
             .onEach { trips ->
                 // 최근 운행이 위에 오도록 뒤집는다
@@ -92,5 +121,9 @@ class HomeViewModel @Inject constructor(
 
     private fun sendSideEffect(effect: HomeSideEffect) {
         viewModelScope.launch { _sideEffect.send(effect) }
+    }
+
+    private companion object {
+        const val COUNTDOWN_TICK_MS = 250L
     }
 }

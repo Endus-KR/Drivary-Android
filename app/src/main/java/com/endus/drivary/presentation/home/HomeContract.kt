@@ -1,6 +1,8 @@
 package com.endus.drivary.presentation.home
 
 data class HomeUiState(
+    /** 운행 중 / 확정 대기 표시. 주차 중이면 null */
+    val recordingStatus: RecordingStatusUiModel? = null,
     val trips: List<TripUiModel> = emptyList(),
     /** 가장 오래된 미처리 운행. 없으면 카드를 숨긴다 */
     val pendingCard: PendingTripCardUiModel? = null,

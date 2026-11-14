@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -72,6 +73,12 @@ fun HomeScreen(
                 )
             },
         )
+        uiState.recordingStatus?.let { status ->
+            RecordingStatusBanner(
+                status = status,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+            )
+        }
         if (uiState.trips.isEmpty()) {
             DrivaryEmptyState(message = "아직 기록된 운행이 없어요")
         } else {
@@ -145,6 +152,11 @@ private fun HomeScreenPreview() {
     DrivaryTheme {
         HomeScreen(
             uiState = HomeUiState(
+                recordingStatus = RecordingStatusUiModel(
+                    title = "주차 · 운행 확정까지 7초",
+                    detail = "이번 주행 3.0km · 그 전에 다시 출발하면 같은 운행으로 이어져요",
+                    isConfirmPending = true,
+                ),
                 trips = listOf(previewTrip),
                 pendingCard = PendingTripCardUiModel(
                     tripId = 1,
