@@ -15,6 +15,11 @@
     <!-- Pleos Vehicle SDK: Gear (권한 미확정이라 함께 선언) -->
     <uses-permission android:name="pleos.car.permission.CAR_POWERTRAIN" />
 
+    <!-- Pleos Vehicle 서비스 존재 확인·바인딩 (Android 11+ 패키지 공개 범위) -->
+    <queries>
+        <package android:name="ai.pleos.playground.service.vehicle" />
+    </queries>
+
     <application
         android:name=".DrivaryApplication"
         android:allowBackup="true"
