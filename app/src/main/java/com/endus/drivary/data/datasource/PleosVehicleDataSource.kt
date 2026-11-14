@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import com.endus.drivary.data.mapper.toDomain
 import com.endus.drivary.domain.model.Gear
+import com.endus.drivary.domain.model.VehicleMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
@@ -34,6 +35,8 @@ class PleosVehicleDataSource @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : VehicleDataSource {
 
+    override val mode: VehicleMode = VehicleMode.PLEOS
+
     private val initLock = Mutex()
     private var vehicle: Vehicle? = null
 
@@ -58,6 +61,7 @@ class PleosVehicleDataSource @Inject constructor(
         val gear = obtainVehicle().getGear()
         val listener = object : GearSelectionListener {
             override fun onSelected(value: VehicleGear?) {
+                Timber.d("기어 수신: $value")
                 trySend(value.toDomain())
             }
 

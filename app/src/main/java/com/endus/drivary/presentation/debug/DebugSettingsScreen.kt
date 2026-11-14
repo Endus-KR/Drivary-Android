@@ -71,12 +71,24 @@ fun DebugSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             DrivaryCard {
-                SectionTitle(text = "기어")
+                SectionTitle(text = "차량 데이터: ${uiState.modeText}")
+            }
+            DrivaryCard {
+                SectionTitle(text = "기어  ${uiState.currentGear.label}")
+                if (!uiState.isGearControlEnabled) {
+                    Text(
+                        text = "Pleos 모드에서는 Virtual Console에서 기어를 바꿔요",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 16.dp),
+                    )
+                }
                 OptionRow {
                     GearUiModel.entries.forEach { gear ->
                         DrivaryButton(
                             text = gear.label,
                             onClick = { onIntent(DebugSettingsIntent.SelectGear(gear)) },
+                            enabled = uiState.isGearControlEnabled,
                             style = if (gear == uiState.currentGear) {
                                 DrivaryButtonStyle.Primary
                             } else {
@@ -87,7 +99,7 @@ fun DebugSettingsScreen(
                 }
             }
             DrivaryCard {
-                SectionTitle(text = "계기판  ${uiState.odometerText}")
+                SectionTitle(text = "추가 주행거리 (계기판 값에 더함)  ${uiState.extraDistanceText}")
                 OptionRow {
                     uiState.distanceOptions.forEach { km ->
                         DrivaryButton(
@@ -139,7 +151,11 @@ private fun OptionRow(content: @Composable () -> Unit) {
 private fun DebugSettingsScreenPreview() {
     DrivaryTheme {
         DebugSettingsScreen(
-            uiState = DebugSettingsUiState(currentGear = GearUiModel.D, odometerText = "12,345.6 km"),
+            uiState = DebugSettingsUiState(
+                modeText = "시연 모드 (Fake 차량)",
+                currentGear = GearUiModel.D,
+                extraDistanceText = "+3.0 km",
+            ),
             onIntent = {},
         )
     }

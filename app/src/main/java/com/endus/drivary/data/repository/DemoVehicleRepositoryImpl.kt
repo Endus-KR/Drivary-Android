@@ -1,5 +1,6 @@
 package com.endus.drivary.data.repository
 
+import com.endus.drivary.data.datasource.DemoDistanceDataSource
 import com.endus.drivary.data.datasource.FakeVehicleDataSource
 import com.endus.drivary.domain.model.Gear
 import com.endus.drivary.domain.repository.DemoVehicleRepository
@@ -8,11 +9,12 @@ import javax.inject.Inject
 
 class DemoVehicleRepositoryImpl @Inject constructor(
     private val fakeVehicleDataSource: FakeVehicleDataSource,
+    private val demoDistanceDataSource: DemoDistanceDataSource,
 ) : DemoVehicleRepository {
 
-    override fun observeOdometerKm(): Flow<Double> = fakeVehicleDataSource.odometer
+    override fun observeExtraDistanceKm(): Flow<Double> = demoDistanceDataSource.observe()
 
     override suspend fun setGear(gear: Gear) = fakeVehicleDataSource.setGear(gear)
 
-    override suspend fun addDistance(km: Double) = fakeVehicleDataSource.addDistance(km)
+    override suspend fun addDistance(km: Double) = demoDistanceDataSource.add(km)
 }

@@ -1,8 +1,11 @@
 package com.endus.drivary.presentation.debug
 
 data class DebugSettingsUiState(
+    val modeText: String = "",
+    /** 시연 모드에서만 앱에서 기어를 바꿀 수 있다. Pleos 모드는 Virtual Console로 바꾼다 */
+    val isGearControlEnabled: Boolean = true,
     val currentGear: GearUiModel = GearUiModel.P,
-    val odometerText: String = "",
+    val extraDistanceText: String = "",
     val confirmDelaySeconds: Long = 10,
     val confirmDelayOptions: List<Long> = listOf(5, 10, 30),
     val distanceOptions: List<Double> = listOf(0.5, 3.0, 10.0),

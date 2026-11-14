@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.endus.drivary.domain.usecase.AddDemoDistanceUseCase
 import com.endus.drivary.domain.usecase.ObserveConfirmDelayUseCase
 import com.endus.drivary.domain.usecase.ObserveCurrentGearUseCase
-import com.endus.drivary.domain.usecase.ObserveDemoOdometerUseCase
+import com.endus.drivary.domain.usecase.ObserveDemoExtraDistanceUseCase
+import com.endus.drivary.domain.usecase.GetVehicleModeUseCase
+import com.endus.drivary.domain.model.VehicleMode
 import com.endus.drivary.domain.usecase.SetConfirmDelayUseCase
 import com.endus.drivary.domain.usecase.SetDemoGearUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +30,8 @@ import kotlin.time.Duration.Companion.seconds
 @HiltViewModel
 class DebugSettingsViewModel @Inject constructor(
     observeCurrentGearUseCase: ObserveCurrentGearUseCase,
-    observeDemoOdometerUseCase: ObserveDemoOdometerUseCase,
+    observeDemoExtraDistanceUseCase: ObserveDemoExtraDistanceUseCase,
+    getVehicleModeUseCase: GetVehicleModeUseCase,
     observeConfirmDelayUseCase: ObserveConfirmDelayUseCase,
     private val setDemoGearUseCase: SetDemoGearUseCase,
     private val addDemoDistanceUseCase: AddDemoDistanceUseCase,
@@ -49,8 +52,19 @@ class DebugSettingsViewModel @Inject constructor(
             .catch { throwable -> Timber.e(throwable) }
             .launchIn(viewModelScope)
 
-        observeDemoOdometerUseCase()
-            .onEach { km -> _uiState.update { it.copy(odometerText = "${kmFormat.format(km)} km") } }
+        getVehicleModeUseCase()
+            .onSuccess { mode ->
+                _uiState.update {
+                    it.copy(
+                        modeText = mode.toText(),
+                        isGearControlEnabled = mode == VehicleMode.DEMO,
+                    )
+                }
+            }
+            .onFailure { throwable -> Timber.e(throwable) }
+
+        observeDemoExtraDistanceUseCase()
+            .onEach { km -> _uiState.update { it.copy(extraDistanceText = "+${kmFormat.format(km)} km") } }
             .catch { throwable -> Timber.e(throwable) }
             .launchIn(viewModelScope)
 
@@ -98,4 +112,9 @@ class DebugSettingsViewModel @Inject constructor(
     private fun sendSideEffect(effect: DebugSettingsSideEffect) {
         viewModelScope.launch { _sideEffect.send(effect) }
     }
+}
+
+private fun VehicleMode.toText(): String = when (this) {
+    VehicleMode.PLEOS -> "Pleos 차량 연결됨"
+    VehicleMode.DEMO -> "시연 모드 (Fake 차량)"
 }
