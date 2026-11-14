@@ -133,6 +133,24 @@ fun DebugSettingsScreen(
                 }
             }
             DrivaryCard {
+                SectionTitle(text = "오늘을 평일로 보기 (주말 시연용)")
+                Text(
+                    text = "켜면 오늘 운행도 평일처럼 자동 분류해요. 오늘 날짜에만 적용돼요.",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+                DrivaryButton(
+                    text = if (uiState.treatTodayAsWeekday) "켜짐" else "꺼짐",
+                    onClick = { onIntent(DebugSettingsIntent.ClickToggleTreatTodayAsWeekday) },
+                    style = if (uiState.treatTodayAsWeekday) {
+                        DrivaryButtonStyle.Primary
+                    } else {
+                        DrivaryButtonStyle.Secondary
+                    },
+                )
+            }
+            DrivaryCard {
                 SectionTitle(text = "샘플 데이터")
                 DrivaryButton(
                     text = "이번 달 샘플 운행 5건 넣기",

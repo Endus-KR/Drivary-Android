@@ -21,4 +21,10 @@ class DemoSettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setNextDestinationId(placeId: Long?) =
         demoSettingsLocalDataSource.setNextDestinationId(placeId)
+
+    override fun observeTreatTodayAsWeekday(): Flow<Boolean> =
+        demoSettingsLocalDataSource.observeTreatTodayAsWeekday()
+
+    override suspend fun setTreatTodayAsWeekday(enabled: Boolean) =
+        demoSettingsLocalDataSource.setTreatTodayAsWeekday(enabled)
 }

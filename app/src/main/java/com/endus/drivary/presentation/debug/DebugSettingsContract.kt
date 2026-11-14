@@ -11,6 +11,7 @@ data class DebugSettingsUiState(
     val distanceOptions: List<Double> = listOf(0.5, 3.0, 10.0),
     val places: List<PlaceUiModel> = emptyList(),
     val nextDestinationId: Long? = null,
+    val treatTodayAsWeekday: Boolean = false,
 )
 
 data class PlaceUiModel(
@@ -23,6 +24,7 @@ sealed interface DebugSettingsIntent {
     data class AddDistance(val km: Double) : DebugSettingsIntent
     data class SelectConfirmDelay(val seconds: Long) : DebugSettingsIntent
     data class SelectNextDestination(val placeId: Long) : DebugSettingsIntent
+    data object ClickToggleTreatTodayAsWeekday : DebugSettingsIntent
     data object ClickAddSampleTrips : DebugSettingsIntent
     data object ClickBack : DebugSettingsIntent
 }

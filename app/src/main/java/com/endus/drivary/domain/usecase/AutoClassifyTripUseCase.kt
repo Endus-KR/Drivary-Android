@@ -1,10 +1,8 @@
 package com.endus.drivary.domain.usecase
 
-import com.endus.drivary.domain.model.RedDayCalendar
 import com.endus.drivary.domain.model.Trip
 import com.endus.drivary.domain.model.TripClassification
 import com.endus.drivary.domain.repository.WorkPlaceRepository
-import java.time.Clock
 import javax.inject.Inject
 
 /**
@@ -13,13 +11,12 @@ import javax.inject.Inject
  */
 class AutoClassifyTripUseCase @Inject constructor(
     private val workPlaceRepository: WorkPlaceRepository,
-    private val clock: Clock,
+    private val checkRedDayUseCase: CheckRedDayUseCase,
 ) {
 
     suspend operator fun invoke(trip: Trip): Result<TripClassification> = runCatching {
         val destination = trip.destination ?: return@runCatching TripClassification.Unclassified
-        val date = trip.startedAt.atZone(clock.zone).toLocalDate()
-        if (RedDayCalendar.isRedDay(date)) return@runCatching TripClassification.Unclassified
+        if (checkRedDayUseCase(trip.startedAt)) return@runCatching TripClassification.Unclassified
         val lastPurpose = workPlaceRepository.getLastPurpose(destination.id)
             ?: return@runCatching TripClassification.Unclassified
         TripClassification.Business(lastPurpose)

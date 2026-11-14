@@ -14,6 +14,7 @@ class DemoSettingsLocalDataSource @Inject constructor() {
 
     private val confirmDelay = MutableStateFlow(DEFAULT_CONFIRM_DELAY)
     private val nextDestinationId = MutableStateFlow<Long?>(DEFAULT_NEXT_DESTINATION_ID)
+    private val treatTodayAsWeekday = MutableStateFlow(false)
 
     fun observeConfirmDelay(): Flow<Duration> = confirmDelay.asStateFlow()
 
@@ -25,6 +26,12 @@ class DemoSettingsLocalDataSource @Inject constructor() {
 
     fun setNextDestinationId(placeId: Long?) {
         nextDestinationId.value = placeId
+    }
+
+    fun observeTreatTodayAsWeekday(): Flow<Boolean> = treatTodayAsWeekday.asStateFlow()
+
+    fun setTreatTodayAsWeekday(enabled: Boolean) {
+        treatTodayAsWeekday.value = enabled
     }
 
     private companion object {

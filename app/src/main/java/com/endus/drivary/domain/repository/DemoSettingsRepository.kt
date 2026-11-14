@@ -15,4 +15,9 @@ interface DemoSettingsRepository {
     fun observeNextDestinationId(): Flow<Long?>
 
     suspend fun setNextDestinationId(placeId: Long?)
+
+    /** 시연이 주말에 있어도 평일 자동 분류를 보여 주기 위해 오늘을 평일로 본다 */
+    fun observeTreatTodayAsWeekday(): Flow<Boolean>
+
+    suspend fun setTreatTodayAsWeekday(enabled: Boolean)
 }

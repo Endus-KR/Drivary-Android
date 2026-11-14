@@ -7,6 +7,8 @@ import com.endus.drivary.domain.usecase.AddSampleTripsUseCase
 import com.endus.drivary.domain.usecase.GetPlacesUseCase
 import com.endus.drivary.domain.usecase.ObserveNextDestinationUseCase
 import com.endus.drivary.domain.usecase.SetNextDestinationUseCase
+import com.endus.drivary.domain.usecase.ObserveTreatTodayAsWeekdayUseCase
+import com.endus.drivary.domain.usecase.SetTreatTodayAsWeekdayUseCase
 import com.endus.drivary.domain.usecase.ObserveConfirmDelayUseCase
 import com.endus.drivary.domain.usecase.ObserveCurrentGearUseCase
 import com.endus.drivary.domain.usecase.ObserveDemoExtraDistanceUseCase
@@ -44,6 +46,8 @@ class DebugSettingsViewModel @Inject constructor(
     private val getPlacesUseCase: GetPlacesUseCase,
     observeNextDestinationUseCase: ObserveNextDestinationUseCase,
     private val setNextDestinationUseCase: SetNextDestinationUseCase,
+    observeTreatTodayAsWeekdayUseCase: ObserveTreatTodayAsWeekdayUseCase,
+    private val setTreatTodayAsWeekdayUseCase: SetTreatTodayAsWeekdayUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DebugSettingsUiState())
@@ -83,6 +87,11 @@ class DebugSettingsViewModel @Inject constructor(
             .catch { throwable -> Timber.e(throwable) }
             .launchIn(viewModelScope)
 
+        observeTreatTodayAsWeekdayUseCase()
+            .onEach { enabled -> _uiState.update { it.copy(treatTodayAsWeekday = enabled) } }
+            .catch { throwable -> Timber.e(throwable) }
+            .launchIn(viewModelScope)
+
         observeConfirmDelayUseCase()
             .onEach { delay -> _uiState.update { it.copy(confirmDelaySeconds = delay.inWholeSeconds) } }
             .catch { throwable -> Timber.e(throwable) }
@@ -95,6 +104,7 @@ class DebugSettingsViewModel @Inject constructor(
             is DebugSettingsIntent.AddDistance -> addDistance(intent.km)
             is DebugSettingsIntent.SelectConfirmDelay -> selectConfirmDelay(intent.seconds)
             is DebugSettingsIntent.SelectNextDestination -> selectNextDestination(intent.placeId)
+            DebugSettingsIntent.ClickToggleTreatTodayAsWeekday -> toggleTreatTodayAsWeekday()
             DebugSettingsIntent.ClickAddSampleTrips -> addSampleTrips()
             DebugSettingsIntent.ClickBack -> sendSideEffect(DebugSettingsSideEffect.NavigateBack)
         }
@@ -137,6 +147,14 @@ class DebugSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             setNextDestinationUseCase(placeId)
                 .onFailure { throwable -> handleFailure(throwable, "다음 도착지를 바꾸지 못했어요") }
+        }
+    }
+
+    private fun toggleTreatTodayAsWeekday() {
+        val enabled = !_uiState.value.treatTodayAsWeekday
+        viewModelScope.launch {
+            setTreatTodayAsWeekdayUseCase(enabled)
+                .onFailure { throwable -> handleFailure(throwable, "설정을 바꾸지 못했어요") }
         }
     }
 
