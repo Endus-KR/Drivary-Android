@@ -31,7 +31,7 @@ class DrivaryApplication : Application() {
     /** 화면 이동과 무관하게 앱이 떠 있는 동안 운행을 기록한다 */
     private fun startTripRecording() {
         applicationScope.launch {
-            recordTripsUseCase()
+            recordTripsUseCase(onError = { throwable -> Timber.e(throwable) })
                 .onFailure { throwable -> Timber.e(throwable) }
         }
     }

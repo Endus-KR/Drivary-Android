@@ -5,6 +5,7 @@ import com.endus.drivary.domain.model.Trip
 import com.endus.drivary.domain.repository.DemoSettingsRepository
 import com.endus.drivary.domain.repository.TripRepository
 import com.endus.drivary.domain.repository.VehicleRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -26,6 +27,8 @@ import javax.inject.Inject
  * - 확정: P 후 확정 대기 시간 동안 재출발이 없으면 확정
  * - 병합: 확정 전에 재출발하면 같은 운행으로 이어 붙인다
  * - 버림: 주행거리가 0 이하인 운행
+ *
+ * 계기판 조회가 실패하면 그 기어 이벤트만 건너뛰고 [onError]로 알린 뒤 기록을 계속한다.
  */
 class RecordTripsUseCase @Inject constructor(
     private val vehicleRepository: VehicleRepository,
@@ -34,9 +37,9 @@ class RecordTripsUseCase @Inject constructor(
     private val clock: Clock,
 ) {
 
-    suspend operator fun invoke(): Result<Unit> = runCatching {
+    suspend operator fun invoke(onError: (Throwable) -> Unit = {}): Result<Unit> = runCatching {
         coroutineScope {
-            val recorder = Recorder(this)
+            val recorder = Recorder(this, onError)
             vehicleRepository.observeGear()
                 .distinctUntilChanged()
                 .collect { gear -> recorder.onGearChanged(gear) }
@@ -44,7 +47,10 @@ class RecordTripsUseCase @Inject constructor(
     }
 
     /** 진행 중인 운행 상태를 관리한다 */
-    private inner class Recorder(private val scope: CoroutineScope) {
+    private inner class Recorder(
+        private val scope: CoroutineScope,
+        private val onError: (Throwable) -> Unit,
+    ) {
 
         private val mutex = Mutex()
         private var pending: PendingTrip? = null
@@ -60,13 +66,22 @@ class RecordTripsUseCase @Inject constructor(
             }
         }
 
+        private suspend fun readOdometerOrNull(): Double? = try {
+            vehicleRepository.getOdometerKm()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            onError(e)
+            null
+        }
+
         private suspend fun onMove(eventAt: Instant) {
             mutex.withLock {
                 val current = pending
                 when {
                     // 새 운행 시작
                     current == null -> {
-                        val odometer = vehicleRepository.getOdometerKm()
+                        val odometer = readOdometerOrNull() ?: return
                         pending = PendingTrip(startedAt = eventAt, odometerBeforeKm = odometer)
                     }
                     // 확정 전 재출발: 같은 운행으로 이어 붙인다
@@ -86,7 +101,7 @@ class RecordTripsUseCase @Inject constructor(
                 val current = pending ?: return
                 if (current.isParked) return
 
-                val odometer = vehicleRepository.getOdometerKm()
+                val odometer = readOdometerOrNull() ?: return
                 val parked = current.copy(endedAt = eventAt, odometerAfterKm = odometer)
                 pending = parked
 
