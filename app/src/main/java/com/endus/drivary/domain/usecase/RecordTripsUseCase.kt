@@ -2,7 +2,9 @@ package com.endus.drivary.domain.usecase
 
 import com.endus.drivary.domain.model.Gear
 import com.endus.drivary.domain.model.Trip
+import com.endus.drivary.domain.model.TripClassification
 import com.endus.drivary.domain.repository.DemoSettingsRepository
+import com.endus.drivary.domain.repository.PlaceRepository
 import com.endus.drivary.domain.repository.TripRepository
 import com.endus.drivary.domain.repository.VehicleRepository
 import kotlinx.coroutines.CancellationException
@@ -27,6 +29,7 @@ import javax.inject.Inject
  * - 확정: P 후 확정 대기 시간 동안 재출발이 없으면 확정
  * - 병합: 확정 전에 재출발하면 같은 운행으로 이어 붙인다
  * - 버림: 주행거리가 0 이하인 운행
+ * - 확정 시 도착지(시연 설정의 다음 도착지)를 붙이고 자동 분류한다
  *
  * 계기판 조회가 실패하면 그 기어 이벤트만 건너뛰고 [onError]로 알린 뒤 기록을 계속한다.
  */
@@ -34,6 +37,8 @@ class RecordTripsUseCase @Inject constructor(
     private val vehicleRepository: VehicleRepository,
     private val tripRepository: TripRepository,
     private val demoSettingsRepository: DemoSettingsRepository,
+    private val placeRepository: PlaceRepository,
+    private val autoClassifyTripUseCase: AutoClassifyTripUseCase,
     private val clock: Clock,
 ) {
 
@@ -112,11 +117,21 @@ class RecordTripsUseCase @Inject constructor(
                         if (pending !== parked) return@withLock
                         pending = null
                         confirmJob = null
-                        parked.toTripOrNull()?.let { tripRepository.addTrip(it) }
+                        parked.toTripOrNull()?.let { trip -> tripRepository.addTrip(withDestinationAndClassification(trip)) }
                     }
                 }
             }
         }
+    }
+
+    /** 도착지를 붙이고 자동 분류한다. 실패해도 운행은 미처리로 남긴다 */
+    private suspend fun withDestinationAndClassification(trip: Trip): Trip {
+        val destinationId = demoSettingsRepository.observeNextDestinationId().first()
+        val destination = placeRepository.getPlaces().firstOrNull { it.id == destinationId }
+        val withDestination = trip.copy(destination = destination)
+        val classification = autoClassifyTripUseCase(withDestination)
+            .getOrDefault(TripClassification.Unclassified)
+        return withDestination.copy(classification = classification)
     }
 
     private data class PendingTrip(

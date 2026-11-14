@@ -10,4 +10,9 @@ interface DemoSettingsRepository {
     fun observeConfirmDelay(): Flow<Duration>
 
     suspend fun setConfirmDelay(delay: Duration)
+
+    /** 다음에 확정되는 운행의 도착지 id (장소 학습 대신 시연에서 고른다) */
+    fun observeNextDestinationId(): Flow<Long?>
+
+    suspend fun setNextDestinationId(placeId: Long?)
 }

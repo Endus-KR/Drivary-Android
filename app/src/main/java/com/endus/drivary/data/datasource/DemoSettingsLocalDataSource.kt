@@ -13,6 +13,7 @@ import kotlin.time.Duration.Companion.seconds
 class DemoSettingsLocalDataSource @Inject constructor() {
 
     private val confirmDelay = MutableStateFlow(DEFAULT_CONFIRM_DELAY)
+    private val nextDestinationId = MutableStateFlow<Long?>(DEFAULT_NEXT_DESTINATION_ID)
 
     fun observeConfirmDelay(): Flow<Duration> = confirmDelay.asStateFlow()
 
@@ -20,7 +21,16 @@ class DemoSettingsLocalDataSource @Inject constructor() {
         confirmDelay.value = delay
     }
 
+    fun observeNextDestinationId(): Flow<Long?> = nextDestinationId.asStateFlow()
+
+    fun setNextDestinationId(placeId: Long?) {
+        nextDestinationId.value = placeId
+    }
+
     private companion object {
         val DEFAULT_CONFIRM_DELAY = 10.seconds
+
+        /** 본사 (PlaceLocalDataSource의 고정 장소 id) */
+        const val DEFAULT_NEXT_DESTINATION_ID = 1L
     }
 }

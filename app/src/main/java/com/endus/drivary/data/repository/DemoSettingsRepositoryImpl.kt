@@ -15,4 +15,10 @@ class DemoSettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setConfirmDelay(delay: Duration) =
         demoSettingsLocalDataSource.setConfirmDelay(delay)
+
+    override fun observeNextDestinationId(): Flow<Long?> =
+        demoSettingsLocalDataSource.observeNextDestinationId()
+
+    override suspend fun setNextDestinationId(placeId: Long?) =
+        demoSettingsLocalDataSource.setNextDestinationId(placeId)
 }
