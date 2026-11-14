@@ -1,5 +1,6 @@
 package com.endus.drivary.presentation.home
 
+import com.endus.drivary.domain.model.DRIVARY_ZONE
 import com.endus.drivary.domain.model.RecordingStatus
 import java.text.DecimalFormat
 import java.time.Duration
@@ -20,7 +21,7 @@ private val kmFormat = DecimalFormat("#,##0.0")
 
 fun RecordingStatus.toUiModel(
     now: Instant,
-    zoneId: ZoneId = ZoneId.systemDefault(),
+    zoneId: ZoneId = DRIVARY_ZONE,
 ): RecordingStatusUiModel? = when (this) {
     RecordingStatus.Idle -> null
 
