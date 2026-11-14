@@ -15,6 +15,7 @@ class DemoSettingsLocalDataSource @Inject constructor() {
     private val confirmDelay = MutableStateFlow(DEFAULT_CONFIRM_DELAY)
     private val nextDestinationId = MutableStateFlow<Long?>(DEFAULT_NEXT_DESTINATION_ID)
     private val treatTodayAsWeekday = MutableStateFlow(false)
+    private val autoDistanceEnabled = MutableStateFlow(true)
 
     fun observeConfirmDelay(): Flow<Duration> = confirmDelay.asStateFlow()
 
@@ -32,6 +33,12 @@ class DemoSettingsLocalDataSource @Inject constructor() {
 
     fun setTreatTodayAsWeekday(enabled: Boolean) {
         treatTodayAsWeekday.value = enabled
+    }
+
+    fun observeAutoDistanceEnabled(): Flow<Boolean> = autoDistanceEnabled.asStateFlow()
+
+    fun setAutoDistanceEnabled(enabled: Boolean) {
+        autoDistanceEnabled.value = enabled
     }
 
     private companion object {

@@ -9,6 +9,8 @@ import com.endus.drivary.domain.usecase.ObserveNextDestinationUseCase
 import com.endus.drivary.domain.usecase.SetNextDestinationUseCase
 import com.endus.drivary.domain.usecase.ObserveTreatTodayAsWeekdayUseCase
 import com.endus.drivary.domain.usecase.SetTreatTodayAsWeekdayUseCase
+import com.endus.drivary.domain.usecase.ObserveAutoDistanceEnabledUseCase
+import com.endus.drivary.domain.usecase.SetAutoDistanceEnabledUseCase
 import com.endus.drivary.domain.usecase.ObserveConfirmDelayUseCase
 import com.endus.drivary.domain.usecase.ObserveCurrentGearUseCase
 import com.endus.drivary.domain.usecase.ObserveDemoExtraDistanceUseCase
@@ -48,6 +50,8 @@ class DebugSettingsViewModel @Inject constructor(
     private val setNextDestinationUseCase: SetNextDestinationUseCase,
     observeTreatTodayAsWeekdayUseCase: ObserveTreatTodayAsWeekdayUseCase,
     private val setTreatTodayAsWeekdayUseCase: SetTreatTodayAsWeekdayUseCase,
+    observeAutoDistanceEnabledUseCase: ObserveAutoDistanceEnabledUseCase,
+    private val setAutoDistanceEnabledUseCase: SetAutoDistanceEnabledUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DebugSettingsUiState())
@@ -92,6 +96,11 @@ class DebugSettingsViewModel @Inject constructor(
             .catch { throwable -> Timber.e(throwable) }
             .launchIn(viewModelScope)
 
+        observeAutoDistanceEnabledUseCase()
+            .onEach { enabled -> _uiState.update { it.copy(autoDistanceEnabled = enabled) } }
+            .catch { throwable -> Timber.e(throwable) }
+            .launchIn(viewModelScope)
+
         observeConfirmDelayUseCase()
             .onEach { delay -> _uiState.update { it.copy(confirmDelaySeconds = delay.inWholeSeconds) } }
             .catch { throwable -> Timber.e(throwable) }
@@ -105,6 +114,7 @@ class DebugSettingsViewModel @Inject constructor(
             is DebugSettingsIntent.SelectConfirmDelay -> selectConfirmDelay(intent.seconds)
             is DebugSettingsIntent.SelectNextDestination -> selectNextDestination(intent.placeId)
             DebugSettingsIntent.ClickToggleTreatTodayAsWeekday -> toggleTreatTodayAsWeekday()
+            DebugSettingsIntent.ClickToggleAutoDistance -> toggleAutoDistance()
             DebugSettingsIntent.ClickAddSampleTrips -> addSampleTrips()
             DebugSettingsIntent.ClickBack -> sendSideEffect(DebugSettingsSideEffect.NavigateBack)
         }
@@ -147,6 +157,14 @@ class DebugSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             setNextDestinationUseCase(placeId)
                 .onFailure { throwable -> handleFailure(throwable, "다음 도착지를 바꾸지 못했어요") }
+        }
+    }
+
+    private fun toggleAutoDistance() {
+        val enabled = !_uiState.value.autoDistanceEnabled
+        viewModelScope.launch {
+            setAutoDistanceEnabledUseCase(enabled)
+                .onFailure { throwable -> handleFailure(throwable, "설정을 바꾸지 못했어요") }
         }
     }
 

@@ -20,4 +20,9 @@ interface DemoSettingsRepository {
     fun observeTreatTodayAsWeekday(): Flow<Boolean>
 
     suspend fun setTreatTodayAsWeekday(enabled: Boolean)
+
+    /** 시연에서 주행 중(D/R)일 때 계기판 값을 저절로 늘린다 (에뮬레이터는 계기판이 움직이지 않는다) */
+    fun observeAutoDistanceEnabled(): Flow<Boolean>
+
+    suspend fun setAutoDistanceEnabled(enabled: Boolean)
 }
