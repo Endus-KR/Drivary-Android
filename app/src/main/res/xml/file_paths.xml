@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 운행기록부 CSV 공유용. LogbookShare.kt가 캐시의 logbook/ 폴더에 파일을 만든다 -->
+<paths>
+    <cache-path
+        name="logbook"
+        path="logbook/" />
+</paths>
