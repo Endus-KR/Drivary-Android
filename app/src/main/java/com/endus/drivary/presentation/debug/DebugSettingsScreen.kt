@@ -3,6 +3,8 @@ package com.endus.drivary.presentation.debug
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -47,6 +49,7 @@ fun DebugSettingsRoute(
     DebugSettingsScreen(uiState = uiState, onIntent = viewModel::onIntent)
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DebugSettingsScreen(
     uiState: DebugSettingsUiState,
@@ -106,6 +109,25 @@ fun DebugSettingsScreen(
                             text = "+${distanceFormat.format(km)} km",
                             onClick = { onIntent(DebugSettingsIntent.AddDistance(km)) },
                             style = DrivaryButtonStyle.Secondary,
+                        )
+                    }
+                }
+            }
+            DrivaryCard {
+                SectionTitle(text = "다음 도착지 (다음에 확정되는 운행)")
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    uiState.places.forEach { place ->
+                        DrivaryButton(
+                            text = place.name,
+                            onClick = { onIntent(DebugSettingsIntent.SelectNextDestination(place.id)) },
+                            style = if (place.id == uiState.nextDestinationId) {
+                                DrivaryButtonStyle.Primary
+                            } else {
+                                DrivaryButtonStyle.Secondary
+                            },
                         )
                     }
                 }
