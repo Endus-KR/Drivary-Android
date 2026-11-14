@@ -20,11 +20,12 @@ class DrivaryApplication : Application() {
     lateinit var recordTripsUseCase: RecordTripsUseCase
 
     override fun onCreate() {
-        super.onCreate()
+        // Hilt가 super.onCreate()에서 의존성을 주입하며 로그를 남기므로 그보다 먼저 심는다
         // 디버그 빌드에서만 로그를 남긴다
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+        super.onCreate()
         startTripRecording()
     }
 
