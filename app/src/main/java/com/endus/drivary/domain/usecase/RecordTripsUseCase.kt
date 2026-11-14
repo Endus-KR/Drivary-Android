@@ -1,10 +1,12 @@
 package com.endus.drivary.domain.usecase
 
 import com.endus.drivary.domain.model.Gear
+import com.endus.drivary.domain.model.RecordingStatus
 import com.endus.drivary.domain.model.Trip
 import com.endus.drivary.domain.model.TripClassification
 import com.endus.drivary.domain.repository.DemoSettingsRepository
 import com.endus.drivary.domain.repository.PlaceRepository
+import com.endus.drivary.domain.repository.RecordingStatusRepository
 import com.endus.drivary.domain.repository.TripRepository
 import com.endus.drivary.domain.repository.VehicleRepository
 import kotlinx.coroutines.CancellationException
@@ -38,6 +40,7 @@ class RecordTripsUseCase @Inject constructor(
     private val tripRepository: TripRepository,
     private val demoSettingsRepository: DemoSettingsRepository,
     private val placeRepository: PlaceRepository,
+    private val recordingStatusRepository: RecordingStatusRepository,
     private val autoClassifyTripUseCase: AutoClassifyTripUseCase,
     private val clock: Clock,
 ) {
@@ -88,12 +91,16 @@ class RecordTripsUseCase @Inject constructor(
                     current == null -> {
                         val odometer = readOdometerOrNull() ?: return
                         pending = PendingTrip(startedAt = eventAt, odometerBeforeKm = odometer)
+                        recordingStatusRepository.setStatus(RecordingStatus.Driving(eventAt, odometer))
                     }
                     // 확정 전 재출발: 같은 운행으로 이어 붙인다
                     current.isParked -> {
                         confirmJob?.cancel()
                         confirmJob = null
                         pending = current.copy(endedAt = null, odometerAfterKm = null)
+                        recordingStatusRepository.setStatus(
+                            RecordingStatus.Driving(current.startedAt, current.odometerBeforeKm),
+                        )
                     }
                     // 이미 주행 중 (D ↔ R 등)
                     else -> Unit
@@ -110,13 +117,24 @@ class RecordTripsUseCase @Inject constructor(
                 val parked = current.copy(endedAt = eventAt, odometerAfterKm = odometer)
                 pending = parked
 
+                val confirmDelay = demoSettingsRepository.observeConfirmDelay().first()
+                recordingStatusRepository.setStatus(
+                    RecordingStatus.ConfirmPending(
+                        startedAt = parked.startedAt,
+                        odometerBeforeKm = parked.odometerBeforeKm,
+                        odometerAfterKm = odometer,
+                        confirmAt = eventAt.plusMillis(confirmDelay.inWholeMilliseconds),
+                    ),
+                )
+
                 confirmJob = scope.launch {
-                    delay(demoSettingsRepository.observeConfirmDelay().first())
+                    delay(confirmDelay)
                     mutex.withLock {
                         // 대기 중 재출발했다면 pending이 바뀌어 있다
                         if (pending !== parked) return@withLock
                         pending = null
                         confirmJob = null
+                        recordingStatusRepository.setStatus(RecordingStatus.Idle)
                         parked.toTripOrNull()?.let { trip -> tripRepository.addTrip(withDestinationAndClassification(trip)) }
                     }
                 }
