@@ -16,3 +16,6 @@ local.properties
 
 # Claude 작업 문서
 CLAUDE.md
+
+# Android Studio 설정
+/.idea/
