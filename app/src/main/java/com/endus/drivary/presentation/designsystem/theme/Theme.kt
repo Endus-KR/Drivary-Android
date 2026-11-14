@@ -1,4 +1,4 @@
-package com.endus.drivary.ui.theme
+package com.endus.drivary.presentation.designsystem.theme
 
 import android.app.Activity
 import android.os.Build
