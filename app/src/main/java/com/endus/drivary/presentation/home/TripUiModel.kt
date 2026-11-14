@@ -1,5 +1,6 @@
 package com.endus.drivary.presentation.home
 
+import com.endus.drivary.domain.model.DRIVARY_ZONE
 import com.endus.drivary.domain.model.Trip
 import com.endus.drivary.domain.model.TripClassification
 import java.text.DecimalFormat
@@ -22,7 +23,7 @@ private val dateFormatter = DateTimeFormatter.ofPattern("M/d(E)", Locale.KOREAN)
 private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.KOREAN)
 private val kmFormat = DecimalFormat("#,##0.0")
 
-fun Trip.toUiModel(zoneId: ZoneId = ZoneId.systemDefault()): TripUiModel {
+fun Trip.toUiModel(zoneId: ZoneId = DRIVARY_ZONE): TripUiModel {
     val start = startedAt.atZone(zoneId)
     val end = endedAt.atZone(zoneId)
     return TripUiModel(

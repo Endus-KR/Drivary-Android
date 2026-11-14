@@ -19,3 +19,6 @@ CLAUDE.md
 
 # Android Studio 설정
 /.idea/
+
+# Kotlin 컴파일러 캐시
+.kotlin/
