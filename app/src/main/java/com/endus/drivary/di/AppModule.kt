@@ -1,5 +1,6 @@
 package com.endus.drivary.di
 
+import com.endus.drivary.domain.model.DRIVARY_ZONE
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,5 +29,5 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideClock(): Clock = Clock.systemDefaultZone()
+    fun provideClock(): Clock = Clock.system(DRIVARY_ZONE)
 }
