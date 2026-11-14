@@ -23,15 +23,16 @@ fun DrivaryTopBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(96.dp)
-            .padding(horizontal = 24.dp),
+            .height(112.dp)
+            .padding(horizontal = 32.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         navigation?.invoke()
         Text(
             text = title,
             style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
         actions()

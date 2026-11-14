@@ -1,58 +1,47 @@
 package com.endus.drivary.presentation.designsystem.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+/**
+ * 차량 화면용 다크 테마. 현대자동차 CI 색(액티브 블루 강조, 라이트 샌드 글자)을 쓴다.
+ * 시연 영상이 기기마다 달라지지 않도록 동적 색상(Material You)과 라이트 테마는 쓰지 않는다.
+ */
+private val DrivaryColorScheme = darkColorScheme(
+    primary = ActiveBlue,
+    onPrimary = Night,
+    primaryContainer = HyundaiBlue,
+    onPrimaryContainer = LightSand,
+    secondary = HyundaiSand,
+    onSecondary = Night,
+    tertiary = DrivaryStatusColors.Unclassified,
+    onTertiary = Night,
+    background = Night,
+    onBackground = LightSand,
+    // 화면 바탕(MainActivity의 Surface)은 가장 어두운 남색, 카드는 한 단계 밝게
+    surface = Night,
+    onSurface = LightSand,
+    surfaceVariant = NightSurfaceHigh,
+    onSurfaceVariant = TextSecondary,
+    surfaceContainerLowest = Night,
+    surfaceContainerLow = NightSurface,
+    surfaceContainer = NightSurface,
+    surfaceContainerHigh = NightSurfaceHigh,
+    surfaceContainerHighest = NightSurfaceHigh,
+    outline = NightOutline,
+    outlineVariant = NightOutline,
+    error = DrivaryStatusColors.RedDay,
+    onError = Night,
 )
 
 @Composable
 fun DrivaryTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = DrivaryColorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }
