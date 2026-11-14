@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.endus.drivary.presentation.designsystem.component.DrivaryButton
-import com.endus.drivary.presentation.designsystem.component.DrivaryButtonStyle
 import com.endus.drivary.presentation.designsystem.component.DrivaryCard
 import com.endus.drivary.presentation.designsystem.component.DrivaryEmptyState
 import com.endus.drivary.presentation.designsystem.component.DrivaryTag
@@ -74,12 +73,9 @@ fun HomeScreen(
                     text = "운행기록부",
                     onClick = { onIntent(HomeIntent.ClickLogbook) },
                 )
-                DrivaryButton(
-                    text = "디버그",
-                    onClick = { onIntent(HomeIntent.ClickDebugSettings) },
-                    style = DrivaryButtonStyle.Secondary,
-                )
             },
+            // 시연 영상에 보이지 않도록 디버그 설정은 제목을 길게 눌러 연다
+            onTitleLongPress = { onIntent(HomeIntent.ClickDebugSettings) },
         )
         val hasNow = uiState.recordingStatus != null || uiState.pendingCard != null
         if (uiState.trips.isEmpty() && !hasNow) {

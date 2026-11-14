@@ -133,6 +133,24 @@ fun DebugSettingsScreen(
                 }
             }
             DrivaryCard {
+                SectionTitle(text = "주행 중 계기판 자동 증가 (시연용)")
+                Text(
+                    text = "기어가 D/R인 동안 1초에 0.5km씩 계기판 값을 늘려요. 실차에서는 꺼 주세요.",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+                DrivaryButton(
+                    text = if (uiState.autoDistanceEnabled) "켜짐" else "꺼짐",
+                    onClick = { onIntent(DebugSettingsIntent.ClickToggleAutoDistance) },
+                    style = if (uiState.autoDistanceEnabled) {
+                        DrivaryButtonStyle.Primary
+                    } else {
+                        DrivaryButtonStyle.Secondary
+                    },
+                )
+            }
+            DrivaryCard {
                 SectionTitle(text = "오늘을 평일로 보기 (주말 시연용)")
                 Text(
                     text = "켜면 오늘 운행도 평일처럼 자동 분류해요. 오늘 날짜에만 적용돼요.",

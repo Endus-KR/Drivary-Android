@@ -27,4 +27,10 @@ class DemoSettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setTreatTodayAsWeekday(enabled: Boolean) =
         demoSettingsLocalDataSource.setTreatTodayAsWeekday(enabled)
+
+    override fun observeAutoDistanceEnabled(): Flow<Boolean> =
+        demoSettingsLocalDataSource.observeAutoDistanceEnabled()
+
+    override suspend fun setAutoDistanceEnabled(enabled: Boolean) =
+        demoSettingsLocalDataSource.setAutoDistanceEnabled(enabled)
 }
